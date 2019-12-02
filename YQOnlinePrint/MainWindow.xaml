@@ -5,8 +5,159 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:YQOnlinePrint"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="元启在线打标系统" Height="800" Width="1000" FontSize="14" 
+        Loaded="Window_Loaded"
+        WindowStyle="SingleBorderWindow">
+    <Window.Resources>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Margin" Value="5 0 0 0"></Setter>
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        </Style>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Height" Value="30"></Setter>
+        </Style>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            <Setter Property="Height" Value="25"></Setter>
+        </Style>
+        <Style TargetType="{x:Type CheckBox}">
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+            <Setter Property="Margin" Value="5 0 0 0"></Setter>
+        </Style>
+    </Window.Resources>
+    <TabControl>
+        <TabItem Header="系统控制">
+            <Grid>
+                <Button Content="自动控制" Command="{Binding Path=AutoCtlCmd}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75"/>
+                <Button Content="停止" Command="{Binding Path=StopCmd}" HorizontalAlignment="Left" Margin="100,10,0,0" VerticalAlignment="Top" Width="76"/>
+                <StackPanel Margin="200,10,0,0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <TextBlock>当前打印：</TextBlock>
+                    <TextBox Text="{Binding Path=BarcodeCfg.PrintBody,Mode=OneWay}" Width="300"></TextBox>
+                </StackPanel>
+                <RichTextBox x:Name="rtxtMsg" HorizontalAlignment="Left" Margin="10,50,0,10"
+                                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                                 VerticalAlignment="Stretch"  MinHeight="500"/>
+            </Grid>
+        </TabItem>
+        <TabItem Header="模板设置">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="340"></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <StackPanel DataContext="{Binding Path=LeftTopCfg}" Orientation="Horizontal" HorizontalAlignment="Left" Height="30" Margin="20,22,0,0" VerticalAlignment="Top" >
+                        <Button Background="DeepSkyBlue" HorizontalAlignment="Left" Height="30" Foreground="White" Content="左上" VerticalAlignment="Top" Width="40"/>
+                        <TextBlock>X:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=X,Mode=TwoWay}"/>
+                        <TextBlock>Y:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=Y,Mode=TwoWay}"/>
+                        <TextBlock>宽度:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=Width,Mode=TwoWay}"/>
+                        <TextBlock>高度:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=Height,Mode=TwoWay}"/>
+                        <TextBlock>字体:</TextBlock>
+                        <TextBox Width="50" Text="{Binding Path=FontName,Mode=TwoWay}"/>
+                        <CheckBox IsChecked="{Binding Path=IsBold,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Content="粗体"/>
+                        <CheckBox IsChecked="{Binding Path=Rotate180,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">180°旋转</CheckBox>
+                        <TextBlock Margin="10 0 0 0">打印内容:</TextBlock>
+                        <TextBox Width="200" Text="{Binding Path=PrintBody,Mode=TwoWay}"/>
+                    </StackPanel>
+                    <StackPanel DataContext="{Binding Path=RightTopCfg}" Orientation="Horizontal" HorizontalAlignment="Left" Height="30" Margin="20,85,0,0" VerticalAlignment="Top" >
+                        <Button Background="Red" HorizontalAlignment="Left" Height="30" Foreground="White" Content="右上" VerticalAlignment="Top" Width="40"/>
+                        <TextBlock>X:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=X,Mode=TwoWay}"/>
+                        <TextBlock>Y:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=Y,Mode=TwoWay}"/>
+                        <TextBlock>宽度:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=Width,Mode=TwoWay}"/>
+                        <TextBlock>高度:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=Height,Mode=TwoWay}"/>
+                        <TextBlock>字体:</TextBlock>
+                        <TextBox Width="50" Text="{Binding Path=FontName,Mode=TwoWay}"/>
+                        <CheckBox IsChecked="{Binding Path=IsBold,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Content="粗体"/>
+                        <CheckBox IsChecked="{Binding Path=Rotate180,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">180°旋转</CheckBox>
+                        <TextBlock Margin="10 0 0 0">打印内容:</TextBlock>
+                        <TextBox Width="50" Text="{Binding Path=PrintHead,Mode=TwoWay}"></TextBox>
+                        <TextBlock Margin="0">+</TextBlock>
+                        <TextBox Width="140" Text="{Binding Path=PrintBody,Mode=TwoWay}"/>
+                    </StackPanel>
+                    <StackPanel DataContext="{Binding Path=LeftBottomCfg}" Orientation="Horizontal" HorizontalAlignment="Left" Height="30" Margin="20,144,0,0" VerticalAlignment="Top">
+                        <Button Background="Purple" HorizontalAlignment="Left" Height="30" Foreground="White" Content="左下" VerticalAlignment="Top" Width="40"/>
+                        <TextBlock>X:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=X,Mode=TwoWay}"/>
+                        <TextBlock>Y:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=Y,Mode=TwoWay}"/>
+                        <TextBlock>宽度:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=Width,Mode=TwoWay}"/>
+                        <TextBlock>高度:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=Height,Mode=TwoWay}"/>
+                        <TextBlock>字体:</TextBlock>
+                        <TextBox Width="50" Text="{Binding Path=FontName,Mode=TwoWay}"/>
+                        <CheckBox IsChecked="{Binding Path=IsBold,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Content="粗体"/>
+                        <CheckBox IsChecked="{Binding Path=Rotate180,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">180°旋转</CheckBox>
+                        <TextBlock Margin="10 0 0 0">打印内容:</TextBlock>
+                        <TextBox Width="200" Text="{Binding Path=PrintBody,Mode=TwoWay}"/>
+                    </StackPanel>
+                    <StackPanel DataContext="{Binding Path=RightBottomCfg}" Orientation="Horizontal" HorizontalAlignment="Left" Height="30" Margin="20,202,0,0" VerticalAlignment="Top" >
+                        <Button Background="Green" HorizontalAlignment="Left" Height="30" Foreground="White" Content="右下" VerticalAlignment="Top" Width="40"/>
+                        <TextBlock>X:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=X,Mode=TwoWay}"/>
+                        <TextBlock>Y:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=Y,Mode=TwoWay}"/>
+                        <TextBlock>宽度:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=Width,Mode=TwoWay}"/>
+                        <TextBlock>高度:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=Height,Mode=TwoWay}"/>
+                        <TextBlock>字体:</TextBlock>
+                        <TextBox Width="50" Text="{Binding Path=FontName,Mode=TwoWay}"/>
+                        <CheckBox IsChecked="{Binding Path=IsBold,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Content="粗体"/>
+                        <CheckBox IsChecked="{Binding Path=Rotate180,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">180°旋转</CheckBox>
+                        <TextBlock Margin="10 0 0 0">打印内容:</TextBlock>
+                        <TextBox Width="200" Text="{Binding Path=PrintBody,Mode=TwoWay}"/>
+                    </StackPanel>
+                    <StackPanel DataContext="{Binding Path=BarcodeCfg}" Orientation="Horizontal" HorizontalAlignment="Left" Height="30" Margin="20,254,0,0" VerticalAlignment="Top" >
+                        <Button Background="Gray" HorizontalAlignment="Left" Height="30" Foreground="White" Content="条码" VerticalAlignment="Top" Width="40"/>
+                        <TextBlock>X:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=X,Mode=TwoWay}"/>
+                        <TextBlock>Y:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=Y,Mode=TwoWay}"/>
+                        <TextBlock>宽度:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=Width,Mode=TwoWay}"/>
+                        <TextBlock>高度:</TextBlock>
+                        <TextBox Width="30" Text="{Binding Path=Height,Mode=TwoWay}"/>
+                        <TextBlock>字体:</TextBlock>
+                        <TextBox Width="50" Text="{Binding Path=FontName,Mode=TwoWay}"/>
+                        <CheckBox IsChecked="{Binding Path=IsBold,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Content="粗体"/>
+                        <CheckBox IsChecked="{Binding Path=Rotate180,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">180°旋转</CheckBox>
+                        <TextBlock Margin="10 0 0 0">打印内容:</TextBlock>
+                        <TextBox Width="200" Text="{Binding Path=PrintBody,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                    <StackPanel Margin="804,22,10,0" Orientation="Horizontal" Height="30" VerticalAlignment="Top">
+                        <TextBlock>打印机dpi:</TextBlock>
+                        <TextBox Width="80" Text="{Binding Path=DPI,Mode=TwoWay}" Height="24"></TextBox>
+                    </StackPanel>
+                    <Button Name="btnTestReplace" Click="BtnTestReplace_Click" Content="测试替换" HorizontalAlignment="Left" Margin="863,253,0,0" VerticalAlignment="Top" Width="76"/>
+                    <Button Command="{Binding Path=SaveCfgCmd}" Content="保存配置" HorizontalAlignment="Left" Margin="804,84,0,0" VerticalAlignment="Top" Width="76"/>
+                    <Button Command="{Binding Path=LoadCfgCmd}" Content="加载配置" HorizontalAlignment="Left" Margin="804,143,0,0" VerticalAlignment="Top" Width="76"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="18,303,0,0" TextWrapping="Wrap" Text="注意：所有坐标、尺寸单位是'毫米'，打印机dpi需要正确设置。" VerticalAlignment="Top"/>
+                </Grid>
+                <Separator Height="1" Background="Black" Grid.Row="0" VerticalAlignment="Bottom"></Separator>
+                <Grid Grid.Row="1">
+                    <Image HorizontalAlignment="Left" Height="185" Margin="17,0,0,0" VerticalAlignment="Top" Width="186" Source="Image/Sample.png"/>
+                    <Button Command="{Binding Path=GenerateZPLCmd}" Content="生成ZPL" HorizontalAlignment="Left" Margin="714,81,0,0" VerticalAlignment="Top" Width="76"/>
+                    <Button Command="{Binding Path=PrintCmd}" Content="打印" HorizontalAlignment="Left" Margin="812,81,0,0" VerticalAlignment="Top" Width="76"/>
+                    <Grid HorizontalAlignment="Left" Margin="200,0,0,0" VerticalAlignment="Top">
+                        <TextBlock VerticalAlignment="Top" Margin="0">ZPL</TextBlock>
+                        <TextBox x:Name="txtCode" HorizontalAlignment="Left" TextWrapping="NoWrap" Text="{Binding ZPL, Mode=TwoWay}" 
+                                 VerticalContentAlignment="Top"
+                                  VerticalAlignment="Top" Margin="0 20 0 0" Width="500" Height="360" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </TabItem>
+       
+    </TabControl>
 </Window>
