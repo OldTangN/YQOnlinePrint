@@ -161,6 +161,12 @@
     <None Include="60 182.prn">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="cfg.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="cfg2.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="cfg_Example1.ini">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
