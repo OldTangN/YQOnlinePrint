@@ -33,7 +33,7 @@
                 <Button Content="自动控制" Command="{Binding Path=AutoCtlCmd}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75"/>
                 <Button Content="停止" Command="{Binding Path=StopCmd}" HorizontalAlignment="Left" Margin="100,10,0,0" VerticalAlignment="Top" Width="76"/>
                 <StackPanel Margin="200,10,0,0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <TextBlock>当前打印：</TextBlock>
+                    <TextBlock>当前打印：</TextBlock> 
                     <TextBox Text="{Binding Path=BarcodeCfg.PrintBody,Mode=OneWay}" Width="300"></TextBox>
                 </StackPanel>
                 <RichTextBox x:Name="rtxtMsg" HorizontalAlignment="Left" Margin="10,50,0,10"
