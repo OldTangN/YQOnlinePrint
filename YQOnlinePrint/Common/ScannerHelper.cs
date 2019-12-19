@@ -65,50 +65,46 @@ namespace YQOnlinePrint.Common
         /// <summary>
         /// 触发扫码，并等待结果返回
         /// </summary>
-        public Task TriggerScan()
+        public void TriggerScan()
         {
-            Task tsk = new Task(() =>
-            {
-                #region 基恩士扫码枪默认触发命令
-                //string strStart = "LON\r\n";
-                //string strStop = "LOFF\r\n";
-                //byte[] bytStart, bytStop;
-                //bytStart = Encoding.ASCII.GetBytes(strStart);
-                //Send(bytStart);
-                //Thread.Sleep(500);//扫描500ms
-                //bytStop = Encoding.ASCII.GetBytes(strStop);
-                //Send(bytStop);
-                #endregion
+            #region 基恩士扫码枪默认触发命令
+            //string strStart = "LON\r\n";
+            //string strStop = "LOFF\r\n";
+            //byte[] bytStart, bytStop;
+            //bytStart = Encoding.ASCII.GetBytes(strStart);
+            //Send(bytStart);
+            //Thread.Sleep(500);//扫描500ms
+            //bytStop = Encoding.ASCII.GetBytes(strStop);
+            //Send(bytStop);
+            #endregion
 
-                MyLog.WriteLog($"{this.Scanner.NAME}{this.Scanner.ComName}触发扫码");
-                byte[] bytStart, bytStop;
-                bytStart = new byte[] { 0x16, 0x54, 0x0d };//启动
-                if (Connect())//重新连接，防止历史数据干扰
+            MyLog.WriteLog($"{this.Scanner.NAME}{this.Scanner.ComName}触发扫码");
+            byte[] bytStart, bytStop;
+            bytStart = new byte[] { 0x16, 0x54, 0x0d };//启动
+            if (Connect())//重新连接，防止历史数据干扰
+            {
+                Send(bytStart);
+                Thread.Sleep(1000);//扫描时间1s
+                bytStop = new byte[] { 0x16, 0x55, 0x0d };//停止
+                Send(bytStop);
+                string data = Receive();
+                if (string.IsNullOrEmpty(data) || data.Length < 4)//未扫到，重新扫
                 {
+                    Thread.Sleep(100);
                     Send(bytStart);
                     Thread.Sleep(1000);//扫描时间1s
                     bytStop = new byte[] { 0x16, 0x55, 0x0d };//停止
                     Send(bytStop);
-                    string data = Receive();
-                    if (string.IsNullOrEmpty(data) || data.Length < 4)//未扫到，重新扫
-                    {
-                        Thread.Sleep(100);
-                        Send(bytStart);
-                        Thread.Sleep(1000);//扫描时间1s
-                        bytStop = new byte[] { 0x16, 0x55, 0x0d };//停止
-                        Send(bytStop);
-                        data = Receive();
-                    }
-                    DisConnect();
-                    RaiseScanned(Scanner, data);
+                    data = Receive();
                 }
-                else
-                {
-                    RaiseError($"{this.Scanner.NAME}{this.Scanner.ComName}扫码枪无法连接!");
-                }
-            });
-            tsk.Start();
-            return tsk;
+                DisConnect();
+                RaiseScanned(Scanner, data);
+            }
+            else
+            {
+                RaiseError($"{this.Scanner.NAME}{this.Scanner.ComName}扫码枪无法连接!");
+            }
+
         }
 
         protected abstract string Receive();

@@ -6,13 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using YQOnlinePrint.Common;
 using YQOnlinePrint.Model;
-using Zebra.Sdk.Comm;
-using Zebra.Sdk.Printer;
 
 namespace YQOnlinePrint.ViewModel
 {
@@ -28,23 +27,23 @@ namespace YQOnlinePrint.ViewModel
         private int _DPI = 300;
         private SerialScannerHelper scanner;
         private EtherNetPLC plc;
-        private TcpConnection tcpConnection;
+        private Socket tcpConnection;
         private bool _InitCompleted = false;
         private bool _IsBusy = false;
         #endregion
 
         #region properties
-        public PrintCfg LeftTopCfg { get => _lt; set => Set(ref _lt, value); }
-        public PrintCfg LeftBottomCfg { get => _lb; set => Set(ref _lb, value); }
-        public PrintCfg RightTopCfg { get => _rt; set => Set(ref _rt, value); }
-        public PrintCfg RightBottomCfg { get => _rb; set => Set(ref _rb, value); }
-        public PrintCfg BarcodeCfg { get => _bar; set => Set(ref _bar, value); }
+        public PrintCfg LeftTopCfg { get { return _lt; } set { Set(ref _lt, value); } }
+        public PrintCfg LeftBottomCfg { get { return _lb; } set { Set(ref _lb, value); } }
+        public PrintCfg RightTopCfg { get { return _rt; } set { Set(ref _rt, value); } }
+        public PrintCfg RightBottomCfg { get { return _rb; } set { Set(ref _rb, value); } }
+        public PrintCfg BarcodeCfg { get { return _bar; } set { Set(ref _bar, value); } }
 
-        public string ZPL { get => _ZPL; set => Set(ref _ZPL, value); }
-        public int DPI { get => _DPI; set => Set(ref _DPI, value); }
+        public string ZPL { get { return _ZPL; } set { Set(ref _ZPL, value); } }
+        public int DPI { get { return _DPI; } set { Set(ref _DPI, value); } }
         public Action<string> OnShowMsg { get; set; }
-        public bool InitCompleted { get => _InitCompleted; set => Set(ref _InitCompleted, value); }
-        public bool IsBusy { get => _IsBusy; set => Set(ref _IsBusy, value); }
+        public bool InitCompleted { get { return _InitCompleted; } set { Set(ref _InitCompleted, value); } }
+        public bool IsBusy { get { return _IsBusy; } set { Set(ref _IsBusy, value); } }
         #endregion
 
         #region contruction
@@ -268,8 +267,8 @@ namespace YQOnlinePrint.ViewModel
                     try
                     {
                         ShowMsg("连接打印机...");
-                        tcpConnection = new TcpConnection(SysCfg.PRINTER_IP, SysCfg.PRINTER_PORT);
-                        tcpConnection.Open();
+                        tcpConnection = new Socket(SocketType.Stream, ProtocolType.Tcp);
+                        tcpConnection.Connect(SysCfg.PRINTER_IP, SysCfg.PRINTER_PORT);
                         if (!tcpConnection.Connected)
                         {
                             ShowMsg("连接打印机失败！");
@@ -298,28 +297,34 @@ namespace YQOnlinePrint.ViewModel
                 }
             });
         }
+        private readonly Object LOCK = new object { };
         private void ListenPLC()
         {
             while (true)
             {
-                try
+                lock(LOCK)
                 {
-                    plc.ReadWord(PlcMemory.DM, SysCfg.DM_READY, out short reData);
-                    if (reData != 1)//电表未到位
+                    try
                     {
-                        Thread.Sleep(1000);
-                        continue;
+                        short reData;
+                        plc.ReadWord(PlcMemory.DM, SysCfg.DM_READY, out reData);
+                        if (reData != 1)//电表未到位
+                        {
+                            Thread.Sleep(1000);
+                            continue;
+                        }
+                        ShowMsg("电表到位,触发扫码!");
+                        //改写PLC状态，防止重复扫码
+                        plc.WriteWord(PlcMemory.DM, SysCfg.DM_READY, 99);
+                        //触发扫码
+                        scanner.TriggerScan();//触发扫码，扫码失败会重试一次
                     }
-                    //改写PLC状态，防止重复扫码
-                    plc.WriteWord(PlcMemory.DM, SysCfg.DM_READY, 2);
-                    //触发扫码
-                    scanner.TriggerScan();//触发扫码，扫码失败会重试一次
-                }
-                catch (Exception ex)
-                {
-                    string errMsg = "监听PLC状态失败！";
-                    MyLog.WriteLog(errMsg, ex);
-                    ShowMsg(errMsg);
+                    catch (Exception ex)
+                    {
+                        string errMsg = "监听PLC状态失败！";
+                        MyLog.WriteLog(errMsg, ex);
+                        ShowMsg(errMsg);
+                    }
                 }
                 Thread.Sleep(1000);
             }
@@ -337,6 +342,7 @@ namespace YQOnlinePrint.ViewModel
             //生成打印ZPL
             try
             {
+                ShowMsg("生成ZPL...");
                 GenerateZPL();
             }
             catch (Exception ex)
@@ -349,8 +355,9 @@ namespace YQOnlinePrint.ViewModel
             //发送至打印机
             try
             {
+                ShowMsg("发送至打印机...");
                 byte[] data = Encoding.ASCII.GetBytes(ZPL);
-                byte[] rcvData = tcpConnection.SendAndWaitForResponse(data, 3000, 3000, "");
+                int len = tcpConnection.Send(data);
             }
             catch (Exception ex)
             {
@@ -362,7 +369,7 @@ namespace YQOnlinePrint.ViewModel
 
         private void Scanner_OnError(string errMsg)
         {
-            ShowMsg("扫码失败！" + errMsg);
+            ShowMsg("扫码异常！" + errMsg);
         }
         #endregion
 
@@ -394,8 +401,8 @@ namespace YQOnlinePrint.ViewModel
                 if (tcpConnection?.Connected != true)
                 {
                     ShowMsg("连接打印机...");
-                    tcpConnection = new TcpConnection(SysCfg.PRINTER_IP, SysCfg.PRINTER_PORT);
-                    tcpConnection.Open();
+                    tcpConnection = new Socket(SocketType.Stream, ProtocolType.Tcp);
+                    tcpConnection.Connect(SysCfg.PRINTER_IP, SysCfg.PRINTER_PORT);
                     if (!tcpConnection.Connected)
                     {
                         ShowMsg("连接打印机失败！");
@@ -403,8 +410,7 @@ namespace YQOnlinePrint.ViewModel
                     }
                     ShowMsg("连接打印机成功!");
                 }
-                tcpConnection.Write(Encoding.ASCII.GetBytes(ZPL));
-
+                int len = tcpConnection.Send(Encoding.ASCII.GetBytes(ZPL));
             }
             catch (Exception ex)
             {

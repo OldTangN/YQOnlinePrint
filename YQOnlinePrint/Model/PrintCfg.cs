@@ -41,15 +41,15 @@ namespace YQOnlinePrint.Model
         #endregion
 
         #region properties
-        public bool Rotate180 { get => _Rotate180; set => Set(ref _Rotate180, value); }
-        public bool IsBold { get => _IsBold; set => Set(ref _IsBold, value); }
-        public string PrintHead { get => _PrintHead; set => Set(ref _PrintHead, value); }
-        public string PrintBody { get => _PrintBody; set => Set(ref _PrintBody, value); }
-        public string FontName { get => _FontName; set => Set(ref _FontName, value); }
-        public double Height { get => _Height; set => Set(ref _Height, value); }
-        public double Width { get => _Width; set => Set(ref _Width, value); }
-        public double Y { get => _Y; set => Set(ref _Y, value); }
-        public double X { get => _X; set => Set(ref _X, value); }
+        public bool Rotate180 { get { return _Rotate180; } set { Set(ref _Rotate180, value); } }
+        public bool IsBold { get { return _IsBold; } set { Set(ref _IsBold, value); } }
+        public string PrintHead { get { return _PrintHead; } set { Set(ref _PrintHead, value); } }
+        public string PrintBody { get { return _PrintBody; } set { Set(ref _PrintBody, value); } }
+        public string FontName { get { return _FontName; } set { Set(ref _FontName, value); } }
+        public double Height { get { return _Height; } set { Set(ref _Height, value); } }
+        public double Width { get { return _Width; } set { Set(ref _Width, value); } }
+        public double Y { get { return _Y; } set { Set(ref _Y, value); } }
+        public double X { get { return _X; } set { Set(ref _X, value); } }
         #endregion
     }
 }

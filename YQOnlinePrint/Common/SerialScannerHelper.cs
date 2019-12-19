@@ -64,7 +64,8 @@ namespace YQOnlinePrint.Common
         {
             try
             {
-                serial = new SerialPort(Scanner.ComName, 9600, Parity.None, 8, StopBits.One);
+                DisConnect();
+                serial = new SerialPort(Scanner.ComName, 115200, Parity.None, 8, StopBits.One);
                 //serial.DataReceived += SerialPort_DataReceived;
                 serial.Open();
                 return true;

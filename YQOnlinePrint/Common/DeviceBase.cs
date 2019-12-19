@@ -19,18 +19,22 @@ namespace YQOnlinePrint.Common
         /// <summary>
         /// 设备编号
         /// </summary>
-        public string NO { get => _NO; set => Set(ref _NO, value); }
+        public string NO { get { return _NO; } set { Set(ref _NO, value); } }
 
         private string _NAME;
         /// <summary>
         /// 设备名称
         /// </summary>
-        public string NAME { get => _NAME; set => Set(ref _NAME, value); }
+        public string NAME
+        {
+            get { return _NAME; }
+            set { Set(ref _NAME, value); }
+        }
 
         private bool _Enable = false;
         /// <summary>
         /// 是否启用
         /// </summary>
-        public bool Enable { get => _Enable; set => Set(ref _Enable, value); }
+        public bool Enable { get { return _Enable; } set { Set(ref _Enable, value); } }
     }
 }

@@ -32,13 +32,17 @@ namespace YQOnlinePrint.Common
         //public int Port { get; set; } = 9004;
 
         private string _Data;
-       
+
         /// <summary>
         /// 扫描到的有效条码，以竖线分割
         /// </summary>
-        public string Data { get => _Data; set => Set(ref _Data, value); }
+        public string Data
+        {
+            get { return _Data; }
+            set { Set(ref _Data, value); }
+        }
 
         private string _ScanTime;
-        public string ScanTime { get => _ScanTime; set => Set(ref _ScanTime, value); }
+        public string ScanTime { get { return _ScanTime; } set { Set(ref _ScanTime, value); } }
     }
 }
